@@ -1,0 +1,398 @@
+openapi: 3.0.3
+info:
+  title: Project Overwatch API
+  description: |
+    GDG Hackathon Project: AI-Agent Cyber Exposure & Intelligence Platform for Rwanda.
+    Acts as an early-warning radar for FinTech threats (e.g., Mobile Money/MoMo smishing).
+    Zero-Trust pipeline ensures all IPv4 addresses are masked before reaching frontend or AI payloads.
+  version: 1.0.0
+  contact:
+    name: Fidele
+servers:
+  - url: http://localhost:5000
+    description: Local development
+
+tags:
+  - name: Auth
+    description: Mocked admin authentication
+  - name: Dashboard
+    description: Summary counters and Rwanda map points
+  - name: Vulnerabilities
+    description: Vulnerability CRUD (in-memory)
+  - name: AI
+    description: AI-powered remediation (mocked for MVP)
+
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        '200':
+          description: API is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Project Overwatch API is running
+
+  /api/auth/admin-login:
+    post:
+      tags: [Auth]
+      summary: Mock admin login
+      operationId: adminLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/dashboard/summary:
+    get:
+      tags: [Dashboard]
+      summary: Get threat summary counters
+      operationId: getDashboardSummary
+      responses:
+        '200':
+          description: Summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SummaryResponse'
+
+  /api/dashboard/map-points:
+    get:
+      tags: [Dashboard]
+      summary: Get live LeakIX Rwanda map threat points (masked IPs)
+      operationId: getMapPoints
+      responses:
+        '200':
+          description: Map points
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapPointsResponse'
+
+  /api/dashboard/alerts:
+    get:
+      tags: [Dashboard]
+      summary: Get recent critical alerts
+      operationId: getAlerts
+      responses:
+        '200':
+          description: List of critical alerts
+
+  /api/dashboard/scans:
+    get:
+      tags: [Dashboard]
+      summary: Get recent manual or automated scans
+      operationId: getScans
+      responses:
+        '200':
+          description: List of recent scans
+
+  /api/public/scan-link:
+    post:
+      tags: [Public]
+      summary: Scan a URL to determine threat level (MoMo phishing)
+      operationId: scanLink
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  example: http://momo-bonus-win.rw/login
+      responses:
+        '200':
+          description: Scan results and recommendations
+
+  /api/vulnerabilities:
+    get:
+      tags: [Vulnerabilities]
+      summary: List all vulnerabilities (masked IPs)
+      operationId: listVulnerabilities
+      responses:
+        '200':
+          description: Vulnerability list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VulnerabilityListResponse'
+    post:
+      tags: [Vulnerabilities]
+      summary: Create a vulnerability
+      operationId: createVulnerability
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VulnerabilityInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VulnerabilityCreateResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/ai/remediation:
+    post:
+      tags: [AI]
+      summary: Get AI remediation steps for a vulnerability
+      operationId: getRemediation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemediationRequest'
+      responses:
+        '200':
+          description: Remediation steps
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemediationResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Some error message
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: admin
+        password:
+          type: string
+          example: overwatch2026
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Admin login successful
+        data:
+          type: object
+          properties:
+            user:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: admin-001
+                username:
+                  type: string
+                  example: admin
+                role:
+                  type: string
+                  example: admin
+            token:
+              type: string
+              example: mock-jwt-token-overwatch-2026
+
+    SummaryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            totalThreats:
+              type: integer
+              example: 7
+            highSeverity:
+              type: integer
+              example: 3
+            mediumSeverity:
+              type: integer
+              example: 2
+            lowSeverity:
+              type: integer
+              example: 2
+            coveredLocations:
+              type: array
+              items:
+                type: string
+              example: [Kigali, Musanze, Rubavu]
+
+    Threat:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        city:
+          type: string
+          enum: [Kigali, Musanze, Rubavu]
+          example: Kigali
+        lat:
+          type: number
+          example: -1.9441
+        lng:
+          type: number
+          example: 30.0619
+        riskScore:
+          type: integer
+          example: 82
+        threatType:
+          type: string
+          example: Phishing Domain
+        ipAddress:
+          type: string
+          description: Last octet masked (Zero-Trust)
+          example: 197.243.10.XXX
+        severity:
+          type: string
+          enum: [high, medium, low]
+          example: high
+
+    MapPointsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Threat'
+
+    VulnerabilityInput:
+      type: object
+      required: [city, lat, lng, riskScore, threatType, ipAddress, severity]
+      properties:
+        city:
+          type: string
+          enum: [Kigali, Musanze, Rubavu]
+          example: Kigali
+        lat:
+          type: number
+          example: -1.9441
+        lng:
+          type: number
+          example: 30.0619
+        riskScore:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 82
+        threatType:
+          type: string
+          example: Phishing Domain
+        ipAddress:
+          type: string
+          format: ipv4
+          example: 197.243.10.45
+        severity:
+          type: string
+          enum: [high, medium, low]
+          example: high
+
+    VulnerabilityListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        count:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Threat'
+
+    VulnerabilityCreateResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          example: Vulnerability created
+        data:
+          $ref: '#/components/schemas/Threat'
+
+    RemediationRequest:
+      type: object
+      required: [vulnerability, language]
+      properties:
+        vulnerability:
+          $ref: '#/components/schemas/VulnerabilityInput'
+        language:
+          type: string
+          enum: [en, rw]
+          example: en
+
+    RemediationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            prompt:
+              type: string
+              description: The AI prompt (IPs masked)
+            language:
+              type: string
+              enum: [en, rw]
+            threatType:
+              type: string
+            remediationSteps:
+              type: array
+              items:
+                type: string
+              minItems: 3
+              maxItems: 3

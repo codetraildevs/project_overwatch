@@ -33,6 +33,7 @@ app.use(helmet());
 const allowedOrigins = [
   'https://overwatch-ui-ob7z.vercel.app', // Eric's deployed Vercel UI
   'http://localhost:3000',                // Local development UI
+  'https://project-overwatch.onrender.com' // Swagger UI Origin on Render
 ];
 
 app.use(cors({

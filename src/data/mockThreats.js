@@ -127,4 +127,26 @@ const mockScans = [
   { id: 'scan-004.rw', time: '2h ago', status: 'complete' },
 ];
 
-module.exports = { mockThreats, mockAlerts, mockScans };
+// ── Mock Assets (Inventory) ──
+const mockAssets = [
+  { id: 'asset-1', name: 'mail.gov.rw', type: 'Domain', status: 'monitored', location: 'Kigali' },
+  { id: 'asset-2', name: 'mtn.co.rw', type: 'Domain', status: 'monitored', location: 'Kigali' },
+  { id: 'asset-3', name: '197.243.0.0/16', type: 'Network', status: 'monitored', location: 'Rwanda' },
+  { id: 'asset-4', name: 'bk.rw', type: 'Domain', status: 'protected', location: 'Kigali' },
+];
+
+// ── Mock Remediation Tasks ──
+const mockRemediationTasks = [
+  { id: 'rem-1', title: 'Close open SSH port on 197.243.10.XXX', priority: 'high', status: 'pending' },
+  { id: 'rem-2', title: 'Update internal SSL certificates', priority: 'medium', status: 'in-progress' },
+  { id: 'rem-3', title: 'Block detected phishing domain on perimeter firewall', priority: 'critical', status: 'pending' },
+];
+
+// ── Mock Reports ──
+const mockReports = [
+  { id: 'rep-1', title: 'Q1 National Cyber Exposure Report', date: '2026-03-01', format: 'PDF', downloadUrl: '#' },
+  { id: 'rep-2', title: 'MoMo Smishing Trends - March 2026', date: '2026-03-15', format: 'PDF', downloadUrl: '#' },
+  { id: 'rep-3', title: 'Critical Infrastructure Audit', date: '2026-03-24', format: 'PDF', downloadUrl: '#' },
+];
+
+module.exports = { mockThreats, mockAlerts, mockScans, mockAssets, mockRemediationTasks, mockReports };

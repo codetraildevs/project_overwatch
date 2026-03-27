@@ -48,6 +48,9 @@ paths:
     post:
       tags: [Auth]
       summary: Mock admin login
+      description: |
+        Multi-user support and role-based access control (RBAC) are planned for the Beta release.
+        Currently, the frontend MVP uses a single hardcoded admin account to bypass provisioning logic.
       operationId: adminLogin
       requestBody:
         required: true
@@ -68,6 +71,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/signup:
+    post:
+      tags: [Auth]
+      summary: Mock user registration flow
+      operationId: signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: object
+                  example: admin@project-overwatch.rw
+                password:
+                  type: string
+                  example: overwatch2026
+      responses:
+        '201':
+          description: User provisioned successfully
+
+  /api/auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Mock password reset flow
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  example: admin@project-overwatch.rw
+      responses:
+        '200':
+          description: Reset link generated
+
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Mock session verifier
+      operationId: getMe
+      responses:
+        '200':
+          description: Active user profile
 
   /api/dashboard/summary:
     get:
@@ -192,6 +247,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /api/assets:
+    get:
+      tags: [Dashboard]
+      summary: Get mocked asset inventory
+      operationId: getAssets
+      responses:
+        '200':
+          description: List of monitored assets
+
+  /api/remediation:
+    get:
+      tags: [Vulnerabilities]
+      summary: Get mocked remediation task list
+      operationId: getRemediationTasks
+      responses:
+        '200':
+          description: List of remediation tasks
+
+  /api/reports:
+    get:
+      tags: [Dashboard]
+      summary: Get mocked intelligence reports
+      operationId: getReports
+      responses:
+        '200':
+          description: List of downloadable reports
 
 components:
   schemas:

@@ -22,6 +22,7 @@ const dashboardRoutes       = require('./routes/dashboard.routes');
 const vulnerabilitiesRoutes = require('./routes/vulnerabilities.routes');
 const aiRoutes              = require('./routes/ai.routes');
 const publicRoutes          = require('./routes/public.routes');
+const dataRoutes            = require('./routes/data.routes');
 
 // ── Create Express app ──────────────────────
 const app = express();
@@ -66,6 +67,7 @@ app.use('/api/dashboard',       dashboardRoutes);
 app.use('/api/vulnerabilities', vulnerabilitiesRoutes);
 app.use('/api/ai',              aiRoutes);
 app.use('/api/public',          publicRoutes);
+app.use('/api',                 dataRoutes);
 
 // Direct aliases requested by frontend MVP
 const { getMapPoints } = require('./controllers/dashboard.controller');

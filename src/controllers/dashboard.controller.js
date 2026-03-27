@@ -8,34 +8,54 @@
 
 const { mockThreats, mockAlerts, mockScans } = require('../data/mockThreats');
 
+const { getLeakIXThreats } = require('../services/leakix.service');
+
 /**
- * GET /api/dashboard/summary
- * Returns counters that match the frontend stat cards:
- *   exposedServices, criticalIssues, warnings, assetsMonitored, protected
- * Also includes the original threat breakdown for flexibility.
+ * GET /api/dashboard/summary (alias for /api/dashboard)
+ * Returns the high-level summary metrics required by the frontend dashboard.
+ * Dynamically calculates average risk score and System Status.
  */
 async function getSummary(req, res, next) {
   try {
-    const threats = mockThreats;
+    const liveThreats = await getLeakIXThreats();
+    const mapData = liveThreats.length > 0 ? liveThreats : mockThreats;
 
-    const high   = threats.filter((t) => t.severity === 'high').length;
-    const medium = threats.filter((t) => t.severity === 'medium').length;
-    const low    = threats.filter((t) => t.severity === 'low').length;
+    let totalScore = 0;
+    let hasCriticalRisk = false;
+
+    mapData.forEach((t) => {
+      totalScore += t.riskScore || 0;
+      if (t.riskScore >= 90) hasCriticalRisk = true;
+    });
+
+    const averageRiskScore = mapData.length > 0 ? Math.round(totalScore / mapData.length) : 0;
+
+    // Logic: Average below 70 = Guarded. Any score 90+ = Elevated Threat. Else Monitoring/Elevated.
+    let systemStatus = 'System Status: Guarded';
+    if (hasCriticalRisk || averageRiskScore >= 70) {
+      systemStatus = 'System Status: Elevated Threat';
+    }
+
+    const highCount = mapData.filter(t => t.severity === 'high' || t.riskScore >= 80).length;
+    const medCount = mapData.filter(t => t.severity === 'medium' || (t.riskScore >= 60 && t.riskScore < 80)).length;
+    const lowCount = mapData.filter(t => t.severity === 'low' || t.riskScore < 60).length;
 
     const summary = {
-      // ── Frontend stat cards ─────────────────
-      exposedServices:  threats.length,
-      criticalIssues:   high,
-      warnings:         medium,
-      assetsMonitored:  threats.length + 5,   // includes non-threat assets
-      protected:        threats.length + 5 - high,
+      // ── Frontend stat cards + System Status ───
+      systemStatus:     systemStatus,
+      averageRiskScore: averageRiskScore,
+      exposedServices:  mapData.length,
+      criticalIssues:   highCount,
+      warnings:         medCount,
+      assetsMonitored:  mapData.length + 5,   // includes non-threat assets
+      protected:        mapData.length + 5 - highCount,
 
       // ── Original breakdown (backwards compat) ─
-      totalThreats:     threats.length,
-      highSeverity:     high,
-      mediumSeverity:   medium,
-      lowSeverity:      low,
-      coveredLocations: ['Kigali', 'Musanze', 'Rubavu'],
+      totalThreats:     mapData.length,
+      highSeverity:     highCount,
+      mediumSeverity:   medCount,
+      lowSeverity:      lowCount,
+      coveredLocations: [...new Set(mapData.map(t => t.city))],
     };
 
     return res.status(200).json({

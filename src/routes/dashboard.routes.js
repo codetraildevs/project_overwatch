@@ -12,6 +12,7 @@ const {
 
 const router = Router();
 
+router.get('/', getSummary);
 router.get('/summary', getSummary);
 router.get('/map-points', getMapPoints);
 router.get('/alerts', getAlerts);

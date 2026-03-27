@@ -18,20 +18,20 @@ const RWANDA_COORDS = {
   'Rubavu':  { lat: -1.6792, lng: 29.2589 },
 };
 
-/** Mock a risk score between 60-90 purely for MVP visualization */
+/** Mock a risk score between 30-100 purely for MVP visualization */
 function calculateRiskScore(ip) {
   let hash = 0;
   for (let i = 0; i < ip.length; i++) {
     hash = ip.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return 60 + (Math.abs(hash) % 31);
+  return 30 + (Math.abs(hash) % 71); // 30 to 100
 }
 
-/** Severity rules */
+/** Severity rules for map marker colors */
 function determineSeverity(score) {
-  if (score >= 80) return 'high';
-  if (score >= 70) return 'medium';
-  return 'low';
+  if (score >= 80) return 'high';   // Red
+  if (score >= 60) return 'medium'; // Orange
+  return 'low';                     // Yellow/Green
 }
 
 /** Normalize and map raw LeakIX leak data to standard threat structure */

@@ -12,7 +12,7 @@ const mockThreats = [
     city: 'Kigali',
     lat: -1.9441,
     lng: 30.0619,
-    riskScore: 82,
+    riskScore: 92, // High
     threatType: 'Phishing Domain',
     ipAddress: '197.243.10.45',
     severity: 'high',
@@ -22,7 +22,7 @@ const mockThreats = [
     city: 'Kigali',
     lat: -1.9500,
     lng: 30.0588,
-    riskScore: 65,
+    riskScore: 65, // Medium
     threatType: 'Open Port Exposure',
     ipAddress: '197.243.12.101',
     severity: 'medium',
@@ -32,7 +32,7 @@ const mockThreats = [
     city: 'Kigali',
     lat: -1.9355,
     lng: 30.0820,
-    riskScore: 45,
+    riskScore: 45, // Low
     threatType: 'Outdated SSL Certificate',
     ipAddress: '197.243.14.200',
     severity: 'low',
@@ -44,17 +44,17 @@ const mockThreats = [
     city: 'Musanze',
     lat: -1.4997,
     lng: 29.6346,
-    riskScore: 78,
+    riskScore: 78, // Medium
     threatType: 'SQL Injection Vector',
     ipAddress: '41.186.30.77',
-    severity: 'high',
+    severity: 'high', // Keeping severity strings as requested by frontend mismatch previously, but updating internal score
   },
   {
     id: 5,
     city: 'Musanze',
     lat: -1.5050,
     lng: 29.6280,
-    riskScore: 55,
+    riskScore: 55, // Low
     threatType: 'Weak Authentication',
     ipAddress: '41.186.31.12',
     severity: 'medium',
@@ -66,7 +66,7 @@ const mockThreats = [
     city: 'Rubavu',
     lat: -1.7474,
     lng: 29.2743,
-    riskScore: 90,
+    riskScore: 90, // High
     threatType: 'Malware C2 Communication',
     ipAddress: '102.22.8.190',
     severity: 'high',
@@ -76,7 +76,7 @@ const mockThreats = [
     city: 'Rubavu',
     lat: -1.7400,
     lng: 29.2800,
-    riskScore: 40,
+    riskScore: 40, // Low
     threatType: 'DNS Misconfiguration',
     ipAddress: '102.22.9.33',
     severity: 'low',

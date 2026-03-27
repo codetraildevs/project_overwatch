@@ -67,6 +67,10 @@ app.use('/api/vulnerabilities', vulnerabilitiesRoutes);
 app.use('/api/ai',              aiRoutes);
 app.use('/api/public',          publicRoutes);
 
+// Direct aliases requested by frontend MVP
+const { getMapPoints } = require('./controllers/dashboard.controller');
+app.get('/api/map', getMapPoints);
+
 // ── Health check ────────────────────────────
 app.get('/api/health', (_req, res) => {
   res.json({ success: true, message: 'Project Overwatch API is running' });

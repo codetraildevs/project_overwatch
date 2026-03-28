@@ -25,6 +25,7 @@ const MOCK_REMEDIATIONS = {
     'Phishing Domain': {
       riskLevel: 'High',
       explanation: 'The identified domain is hosting a phishing page targeting local MoMo users.',
+      financialImpact: 'High risk of financial fraud and loss of customer trust in Rwandan digital payments.',
       recommendedFix: 'Immediately block the domain at the DNS level and notify the Rwanda NCSA.',
       confidenceScore: 95,
       remediationSteps: [
@@ -36,6 +37,7 @@ const MOCK_REMEDIATIONS = {
     'SQL Injection Vector': {
       riskLevel: 'Critical',
       explanation: 'An unparameterized query was detected in the data access layer, allowing potential database takeover.',
+      financialImpact: 'Potential total data breach and catastrophic financial loss for the affected FinTech entity.',
       recommendedFix: 'Use prepared statements for all database queries and deploy a WAF rule.',
       confidenceScore: 98,
       remediationSteps: [
@@ -47,6 +49,7 @@ const MOCK_REMEDIATIONS = {
     _default: {
       riskLevel: 'Medium',
       explanation: 'A potential security anomaly was detected on the target infrastructure.',
+      financialImpact: 'Moderate disruption to business operations and potential regulatory non-compliance fines.',
       recommendedFix: 'Isolate the affected asset and perform a thorough forensic audit.',
       confidenceScore: 85,
       remediationSteps: [
@@ -60,6 +63,7 @@ const MOCK_REMEDIATIONS = {
     'Phishing Domain': {
       riskLevel: 'Hanitse',
       explanation: 'Urubuga rwabonetse ruriho uburiganya bugenewe abakoresha MoMo mu Rwanda.',
+      financialImpact: 'Ibyago byo kwibwa amafaranga menshi kuri MoMo ndetse no gutakaza icyizere ku bakiriya.',
       recommendedFix: 'Hagarika uyu muyoboro kuri DNS maze umenyeshe NCSA ako kanya.',
       confidenceScore: 95,
       remediationSteps: [
@@ -71,6 +75,7 @@ const MOCK_REMEDIATIONS = {
     'SQL Injection Vector': {
       riskLevel: 'Komeye Cyane',
       explanation: 'Hari intege nke muri databaze zishobora gutuma umwanzi ayigarurira.',
+      financialImpact: 'Umutekano mucye w\'amakuru yose ndetse n\'igihombo gikabije ku kigo.',
       recommendedFix: 'Koresha uburyo bwa prepared statements mu kwinjira muri databaze.',
       confidenceScore: 98,
       remediationSteps: [
@@ -82,6 +87,7 @@ const MOCK_REMEDIATIONS = {
     _default: {
       riskLevel: 'Iringaniye',
       explanation: 'Habonetse ikibazo kishobora guhungabanya umutekano w\'ikoranabuhanga.',
+      financialImpact: 'Kuhagarara kw\'imirimo mu gihe gito ndetse n\'ibihano bishobora gutangwa n\'inzego zibishinzwe.',
       recommendedFix: 'Tandukanya igikoresho cyagize ikibazo n\'umuyoboro maze ukore isuzuma.',
       confidenceScore: 85,
       remediationSteps: [
@@ -102,12 +108,13 @@ function buildRemediationPrompt(vulnerability, language) {
 
   return [
     `You are a senior cybersecurity expert specialized in Rwandan FinTech.`,
-    `Analyze the following vulnerability and return a JSON object with exactly 5 fields in ${lang}:`,
+    `Analyze the following vulnerability and return a JSON object with exactly 6 fields in ${lang}:`,
     `1. "riskLevel": A single word rating (Critical, High, Medium, Low).`,
     `2. "explanation": To provide a one-sentence clear explanation of the threat.`,
-    `3. "recommendedFix": A one-sentence actionable technical fix.`,
-    `4. "confidenceScore": An integer between 0 and 100.`,
-    `5. "remediationSteps": A JSON array of exactly 3 detailed strings providing a step-by-step action plan.`,
+    `3. "financialImpact": A one-sentence explanation of the potential business/financial risk in Rwanda.`,
+    `4. "recommendedFix": A one-sentence actionable technical fix.`,
+    `5. "confidenceScore": An integer between 0 and 100.`,
+    `6. "remediationSteps": A JSON array of exactly 3 detailed strings providing a step-by-step action plan.`,
     ``,
     `Vulnerability:`,
     `  Target: ${masked.ipAddress} (${masked.city})`,
@@ -147,7 +154,7 @@ async function getRemediation(vulnerability, language = 'en') {
         const cleanJson = text.trim().replace(/```json/g, '').replace(/```/g, '').trim();
         const parsed = JSON.parse(cleanJson);
 
-        if (parsed.riskLevel && parsed.remediationSteps) {
+        if (parsed.riskLevel && parsed.financialImpact && parsed.remediationSteps) {
           return {
             ...parsed,
             source: `ODIP AI (${modelName}) - Live Insight`

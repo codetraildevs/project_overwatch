@@ -1,4 +1,4 @@
-openapi: 3.0.3
+﻿openapi: 3.0.3
 info:
   title: ODIP Intelligence API
   description: |
@@ -42,7 +42,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Project Overwatch API is running
+                    example: ODIP Intelligence API is running
 
   /api/auth/admin-login:
     post:
@@ -488,6 +488,9 @@ components:
             explanation:
               type: string
               example: "The identified domain is hosting a phishing page targeting local MoMo users."
+            financialImpact:
+              type: string
+              example: "High risk of financial fraud and loss of customer trust in Rwandan digital payments."
             recommendedFix:
               type: string
               example: "Immediately block the domain at the DNS level and notify the Rwanda NCSA."
@@ -508,4 +511,4 @@ components:
                 - "Report the phishing URL to the Rwanda NCSA."
             source:
               type: string
-              example: "Gemini AI (gemini-2.0-flash) - Live Insight"
+              example: "ODIP AI (gemini-2.0-flash) - Live Insight"

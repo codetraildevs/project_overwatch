@@ -5,23 +5,28 @@
 
 'use strict';
 
-const { mockThreats } = require('../data/mockThreats');
-const { vulnerabilitySchema } = require('../utils/validators');
+const { getLeakIXThreats } = require('../services/leakix.service');
 
-// In-memory store seeded with mock data
-const vulnerabilities = [...mockThreats];
-let nextId = mockThreats.length + 1;
+// In-memory store seeded with agent discoveries
+const agentDiscoveries = [];
+let nextId = 1000;
 
 /**
  * GET /api/vulnerabilities
- * IPs are masked automatically by the middleware.
  */
 async function listVulnerabilities(req, res, next) {
   try {
+    const liveThreats = await getLeakIXThreats();
+    
+    // Combine live OSINT results with in-memory agent discoveries
+    const allVulnerabilities = liveThreats.length > 0
+      ? [...liveThreats, ...agentDiscoveries]
+      : [...mockThreats, ...agentDiscoveries];
+
     return res.status(200).json({
       success: true,
-      count: vulnerabilities.length,
-      data: vulnerabilities,
+      count: allVulnerabilities.length,
+      data: allVulnerabilities,
     });
   } catch (err) {
     next(err);

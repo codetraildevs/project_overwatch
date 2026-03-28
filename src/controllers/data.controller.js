@@ -69,9 +69,22 @@ async function getRemediationTasks(req, res, next) {
  */
 async function getReports(req, res, next) {
   try {
+    const liveThreats = await getLeakIXThreats();
+    
+    // Generate a live report stub for the dashboard
+    const now = new Date();
+    const liveReport = {
+      id: `rep-live-${now.getTime()}`,
+      title: `National Exposure Audit - ${now.toLocaleDateString()}`,
+      date: now.toISOString().split('T')[0],
+      format: 'PDF',
+      downloadUrl: '#',
+      liveDataCount: liveThreats.length
+    };
+
     return res.status(200).json({
       success: true,
-      data: mockReports,
+      data: [liveReport, ...mockReports],
     });
   } catch (err) {
     next(err);

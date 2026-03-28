@@ -1,7 +1,7 @@
 {
-  "name": "project-overwatch-backend",
+  "name": "odip-intelligence-backend",
   "version": "1.0.0",
-  "description": "Project Overwatch – AI-Agent OSINT Platform MVP Backend (Rwanda-focused)",
+  "description": "ODIP Intelligence – AI-Powered Cyber Exposure & Intelligence Platform (Rwanda)",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

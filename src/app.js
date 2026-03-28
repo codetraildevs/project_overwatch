@@ -58,7 +58,7 @@ app.use(maskIpMiddleware);
 const swaggerDoc = YAML.load(path.join(__dirname, '..', 'openapi.yaml'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc, {
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Project Overwatch API Docs',
+  customSiteTitle: 'ODIP Intelligence API Docs',
 }));
 
 // ── API routes ──────────────────────────────
@@ -75,7 +75,7 @@ app.get('/api/map', getMapPoints);
 
 // ── Health check ────────────────────────────
 app.get('/api/health', (_req, res) => {
-  res.json({ success: true, message: 'Project Overwatch API is running' });
+  res.json({ success: true, message: 'ODIP Intelligence API is running' });
 });
 
 // ── 404 handler ─────────────────────────────

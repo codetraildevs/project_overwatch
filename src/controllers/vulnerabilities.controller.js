@@ -1,13 +1,13 @@
-// ──────────────────────────────────────────────
-// Vulnerabilities Controller
-// In-memory storage for MVP
+﻿// ODIP Intelligence - Vulnerabilities Controller
+// Discovery in-memory store & Live integration
 // ──────────────────────────────────────────────
 
 'use strict';
 
+const { mockThreats } = require('../data/mockThreats');
 const { getLeakIXThreats } = require('../services/leakix.service');
 
-// In-memory store seeded with agent discoveries
+// In-memory store for agent discoveries
 const agentDiscoveries = [];
 let nextId = 1000;
 
@@ -18,7 +18,7 @@ async function listVulnerabilities(req, res, next) {
   try {
     const liveThreats = await getLeakIXThreats();
     
-    // Combine live OSINT results with in-memory agent discoveries
+    // Combine live findings with manual agent discoveries
     const allVulnerabilities = liveThreats.length > 0
       ? [...liveThreats, ...agentDiscoveries]
       : [...mockThreats, ...agentDiscoveries];
@@ -35,29 +35,16 @@ async function listVulnerabilities(req, res, next) {
 
 /**
  * POST /api/vulnerabilities
- * Accepts new vulnerability data, validates, stores, and returns masked.
  */
 async function createVulnerability(req, res, next) {
   try {
-    const { error, value } = vulnerabilitySchema.validate(req.body, {
-      abortEarly: false,
-      stripUnknown: true,
-    });
+    // Basic assignment for Agent MVP
+    const newVuln = { id: nextId++, ...req.body };
+    agentDiscoveries.push(newVuln);
 
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.details.map((d) => d.message).join('; '),
-      });
-    }
-
-    const newVuln = { id: nextId++, ...value };
-    vulnerabilities.push(newVuln);
-
-    // Response goes through maskIpMiddleware → IP auto-masked
     return res.status(201).json({
       success: true,
-      message: 'Vulnerability created',
+      message: 'ODIP Agent discovery registered',
       data: newVuln,
     });
   } catch (err) {

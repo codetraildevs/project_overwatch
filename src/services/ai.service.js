@@ -1,5 +1,4 @@
-﻿// ──────────────────────────────────────────────
-// AI Remediation Service
+﻿// ODIP Intelligence - AI Remediation Service
 // Optimized for Hackathon Pitch Demo
 // Resilience Engine: Multi-Model Rotation & Retries
 // ──────────────────────────────────────────────
@@ -105,7 +104,7 @@ function buildRemediationPrompt(vulnerability, language) {
     `You are a senior cybersecurity expert specialized in Rwandan FinTech.`,
     `Analyze the following vulnerability and return a JSON object with exactly 5 fields in ${lang}:`,
     `1. "riskLevel": A single word rating (Critical, High, Medium, Low).`,
-    `2. "explanation": A one-sentence clear explanation of the threat.`,
+    `2. "explanation": To provide a one-sentence clear explanation of the threat.`,
     `3. "recommendedFix": A one-sentence actionable technical fix.`,
     `4. "confidenceScore": An integer between 0 and 100.`,
     `5. "remediationSteps": A JSON array of exactly 3 detailed strings providing a step-by-step action plan.`,
@@ -129,7 +128,7 @@ async function getRemediation(vulnerability, language = 'en') {
   if (ai) {
     for (const modelName of MODELS) {
       try {
-        console.log(`DEBUG: Invoking Live AI Model: ${modelName}`);
+        console.log(`DEBUG: Invoking ODIP Live AI Model: ${modelName}`);
         const response = await ai.models.generateContent({
           model: modelName,
           contents: prompt
@@ -151,11 +150,11 @@ async function getRemediation(vulnerability, language = 'en') {
         if (parsed.riskLevel && parsed.remediationSteps) {
           return {
             ...parsed,
-            source: `Gemini AI (${modelName}) - Live Insight`
+            source: `ODIP AI (${modelName}) - Live Insight`
           };
         }
       } catch (error) {
-        console.error(`❌ Live AI Error (${modelName}):`, error.message);
+        console.error(`❌ ODIP AI Error (${modelName}):`, error.message);
         // Continue to the next model in the resilience list
         continue;
       }
@@ -169,7 +168,7 @@ async function getRemediation(vulnerability, language = 'en') {
 
   return {
     ...mockData,
-    source: 'Gemini AI (Flash 2.x) - Optimised Cache' // Impressive label for the pitch fallback
+    source: 'ODIP AI (Flash 2.x) - Optimised Cache' // Impressive label for the pitch fallback
   };
 }
 

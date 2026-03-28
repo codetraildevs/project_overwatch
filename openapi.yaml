@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Project Overwatch API
+  title: ODIP Intelligence API
   description: |
-    GDG Hackathon Project: AI-Agent Cyber Exposure & Intelligence Platform for Rwanda.
+    AI-Powered Cyber Exposure & Intelligence Platform for Rwanda.
     Acts as an early-warning radar for FinTech threats (e.g., Mobile Money/MoMo smishing).
     Zero-Trust pipeline ensures all IPv4 addresses are masked before reaching frontend or AI payloads.
   version: 1.0.0

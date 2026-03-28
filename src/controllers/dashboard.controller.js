@@ -67,7 +67,7 @@ async function getSummary(req, res, next) {
   }
 }
 
-const { getLeakIXThreats } = require('../services/leakix.service');
+
 
 /**
  * GET /api/dashboard/map-points

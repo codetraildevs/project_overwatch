@@ -127,7 +127,10 @@ paths:
   /api/dashboard/summary:
     get:
       tags: [Dashboard]
-      summary: Get threat summary counters
+      summary: Get live threat summary counters
+      description: |
+        Calculates real-time metrics (System Status, Avg Risk Score) based on live LeakIX OSINT.
+        Automatically falls back to Demo stats if live feed is empty.
       operationId: getDashboardSummary
       responses:
         '200':
@@ -334,18 +337,30 @@ components:
         data:
           type: object
           properties:
+            systemStatus:
+              type: string
+              example: "System Status: Elevated Threat"
+            averageRiskScore:
+              type: integer
+              example: 72
+            exposedServices:
+              type: integer
+              example: 15
+            criticalIssues:
+              type: integer
+              example: 4
+            warnings:
+              type: integer
+              example: 6
+            assetsMonitored:
+              type: integer
+              example: 20
+            protected:
+              type: integer
+              example: 16
             totalThreats:
               type: integer
-              example: 7
-            highSeverity:
-              type: integer
-              example: 3
-            mediumSeverity:
-              type: integer
-              example: 2
-            lowSeverity:
-              type: integer
-              example: 2
+              example: 10
             coveredLocations:
               type: array
               items:
@@ -466,17 +481,31 @@ components:
         data:
           type: object
           properties:
-            prompt:
+            riskLevel:
               type: string
-              description: The AI prompt (IPs masked)
-            language:
+              enum: [Critical, High, Medium, Low]
+              example: High
+            explanation:
               type: string
-              enum: [en, rw]
-            threatType:
+              example: "The identified domain is hosting a phishing page targeting local MoMo users."
+            recommendedFix:
               type: string
+              example: "Immediately block the domain at the DNS level and notify the Rwanda NCSA."
+            confidenceScore:
+              type: integer
+              minimum: 0
+              maximum: 100
+              example: 95
             remediationSteps:
               type: array
               items:
                 type: string
               minItems: 3
               maxItems: 3
+              example:
+                - "Block the malicious domain at the organization perimeter firewall."
+                - "Issue an urgent security advisory to all employees."
+                - "Report the phishing URL to the Rwanda NCSA."
+            source:
+              type: string
+              example: "Gemini AI (gemini-2.0-flash) - Live Insight"

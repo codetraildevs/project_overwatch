@@ -5,7 +5,12 @@
 
 'use strict';
 
+const { GoogleGenAI } = require('@google/genai');
 const { deepMask } = require('../utils/maskIp');
+
+// ── Gemini Initialization ────────────────────
+// The client automatically picks up process.env.GEMINI_API_KEY
+const ai = process.env.GEMINI_API_KEY ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
 
 // ── Mocked remediation responses ────────────
 const MOCK_REMEDIATIONS = {
@@ -82,7 +87,7 @@ const MOCK_REMEDIATIONS = {
 };
 
 /**
- * Build a prompt string for the AI model (Gemini in future).
+ * Build a prompt string for the AI model (Gemini).
  * IPs are masked BEFORE the prompt is created.
  */
 function buildRemediationPrompt(vulnerability, language) {
@@ -90,38 +95,82 @@ function buildRemediationPrompt(vulnerability, language) {
   const lang = language === 'rw' ? 'Kinyarwanda' : 'English';
 
   return [
-    `You are a cybersecurity remediation expert for Rwandan FinTech infrastructure.`,
+    `You are a senior cybersecurity remediation expert specializing in Rwandan FinTech and MoMo infrastructure.`,
     `Analyse the following vulnerability and provide exactly 3 actionable remediation steps in ${lang}.`,
+    `Focus on localized context (e.g., NCSA reporting, RURA regulations) where applicable.`,
     ``,
-    `Vulnerability details (masked for Zero-Trust compliance):`,
+    `Vulnerability Details:`,
     `  City       : ${masked.city}`,
     `  Threat Type: ${masked.threatType}`,
     `  Severity   : ${masked.severity}`,
-    `  Risk Score : ${masked.riskScore}`,
-    `  IP Address : ${masked.ipAddress}`,
+    `  Risk Score : ${masked.riskScore}/100`,
+    `  Target     : ${masked.ipAddress}`,
     ``,
-    `Return ONLY 3 numbered steps. No preamble, no conclusion.`,
+    `Return ONLY the 3 numbered steps. No preamble. No conclusion.`,
   ].join('\n');
 }
 
 /**
- * Generate mocked remediation output.
- * Future: replace body with a real Gemini API call using the prompt.
+ * Generate remediation output via Gemini Pro.
+ * Falls back to mock data if API key is missing or call fails.
  */
 async function getRemediation(vulnerability, language = 'en') {
   const prompt = buildRemediationPrompt(vulnerability, language);
 
-  // ── Mocked response (swap for Gemini call later) ──
+  if (ai) {
+    try {
+      // Using Gemini 2.0 Flash as identified in supported models list
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.0-flash',
+        contents: prompt
+      });
+
+      const text = response.text();
+      
+      // Parse the numbered list from the text
+      const steps = text.split('\n')
+        .map(line => line.trim())
+        .filter(line => line.match(/^\d+[\.\)]\s+/))
+        .map(line => line.replace(/^\d+[\.\)]\s*/, '').trim());
+
+      if (steps.length >= 3) {
+        return {
+          prompt,
+          language,
+          threatType: vulnerability.threatType,
+          remediationSteps: steps.slice(0, 3),
+          source: 'Gemini AI (Live)'
+        };
+      } else if (text.length > 20) {
+        // Simple fallback parsing for unstructured AI responses
+        const simpleSteps = text.split('\n').filter(l => l.length > 5).slice(0, 3);
+        if (simpleSteps.length >= 2) {
+           return {
+             prompt,
+             language,
+             threatType: vulnerability.threatType,
+             remediationSteps: simpleSteps.map(s => s.replace(/^\s*[-*•]\s*/, '').trim()),
+             source: 'Gemini AI (Raw)'
+           };
+        }
+      }
+    } catch (error) {
+      console.error('❌ Gemini API Error:', error.message);
+    }
+  }
+
+  // ── Fallback to Mocks ─────────────────────
   const langPack = MOCK_REMEDIATIONS[language] || MOCK_REMEDIATIONS.en;
-  const steps =
-    langPack[vulnerability.threatType] || langPack._default;
+  const steps = langPack[vulnerability.threatType] || langPack._default;
 
   return {
-    prompt,           // included for transparency / debugging
+    prompt,
     language,
     threatType: vulnerability.threatType,
     remediationSteps: steps,
+    source: 'Mock (Fallback)'
   };
 }
 
 module.exports = { getRemediation, buildRemediationPrompt };
+                                                                                                  
